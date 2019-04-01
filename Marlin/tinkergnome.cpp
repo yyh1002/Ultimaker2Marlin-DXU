@@ -1772,7 +1772,10 @@ void lcd_prepare_buildplate_adjust()
     strcat_P(buffer, PSTR(" Z0"));
     enquecommand(buffer);
 
+    // Center adjust
     sprintf_P(buffer, PSTR("G1 F%i Z%i X%i Y%i"), int(homing_feedrate[0]), 20, AXIS_CENTER_POS(X_AXIS), AXIS_CENTER_POS(Y_AXIS));
+    // Right adjust
+    //sprintf_P(buffer, PSTR("G1 F%i Z%i X%i Y%i"), int(homing_feedrate[0]), 20, int(max_pos[X_AXIS])-15, max(int(min_pos[Y_AXIS]), 0)+20);
     enquecommand(buffer);
     enquecommand_P(PSTR("M84 X0 Y0"));
 }
@@ -2879,10 +2882,10 @@ static void lcd_extrude_init_pull()
     digipot_current(2, motor_current_setting[2]*2/3);
 #endif
     //increase max. feedrate and reduce acceleration
-    OLD_FEEDRATE = max_feedrate[E_AXIS];
+    //OLD_FEEDRATE = max_feedrate[E_AXIS];
     OLD_ACCEL = retract_acceleration;
     OLD_JERK = max_e_jerk;
-    max_feedrate[E_AXIS] = float(FILAMENT_FAST_STEPS) / e_steps_per_unit(menu_extruder);
+    //max_feedrate[E_AXIS] = float(FILAMENT_FAST_STEPS) / e_steps_per_unit(menu_extruder);
     retract_acceleration = float(FILAMENT_LONG_ACCELERATION_STEPS) / e_steps_per_unit(menu_extruder);
     max_e_jerk = FILAMENT_LONG_MOVE_JERK;
 }

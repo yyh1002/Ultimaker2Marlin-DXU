@@ -131,7 +131,7 @@ static void parkHeadForLeftAdjustment()
 #if (EXTRUDERS > 1)
     if IS_DUAL_ENABLED
     {
-        sprintf_P(buffer, PSTR("G1 F%i X%i Y%i"), int(homing_feedrate[X_AXIS]), max(int(min_pos[X_AXIS]), 0)+10, max(int(min_pos[Y_AXIS]), 0)+int(DUAL_Y_MIN_POS));
+        sprintf_P(buffer, PSTR("G1 F%i X%i Y%i"), int(homing_feedrate[X_AXIS]), max(int(min_pos[X_AXIS]), 0)+15, max(int(min_pos[Y_AXIS]), 0)+20);
     }
     else
     {
@@ -180,7 +180,7 @@ static void parkHeadForRightAdjustment()
 #if (EXTRUDERS > 1)
     if IS_DUAL_ENABLED
     {
-        sprintf_P(buffer, PSTR("G1 F%i X%i Y%i"), int(homing_feedrate[X_AXIS]), int(max_pos[X_AXIS])-10, max(int(min_pos[Y_AXIS]), 0)+int(DUAL_Y_MIN_POS));
+        sprintf_P(buffer, PSTR("G1 F%i X%i Y%i"), int(homing_feedrate[X_AXIS]), int(max_pos[X_AXIS])-15, max(int(min_pos[Y_AXIS]), 0)+20);
     }
     else
     {
@@ -474,10 +474,10 @@ static void lcd_menu_first_run_material_load_heatup()
 static void runMaterialForward()
 {
     //Override the max feedrate and acceleration values to get a better insert speed and speedup/slowdown
-    float old_max_feedrate_e = max_feedrate[E_AXIS];
+    //float old_max_feedrate_e = max_feedrate[E_AXIS];
     float old_retract_acceleration = retract_acceleration;
     float old_max_e_jerk = max_e_jerk;
-    max_feedrate[E_AXIS] = float(FILAMENT_FAST_STEPS) / e_steps_per_unit(active_extruder);
+    //max_feedrate[E_AXIS] = float(FILAMENT_FAST_STEPS) / e_steps_per_unit(active_extruder);
     retract_acceleration = float(FILAMENT_LONG_ACCELERATION_STEPS) / e_steps_per_unit(active_extruder);
     max_e_jerk = FILAMENT_LONG_MOVE_JERK;
 
@@ -488,7 +488,7 @@ static void runMaterialForward()
     plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], max_feedrate[E_AXIS], 0);
 
     //Put back original values.
-    max_feedrate[E_AXIS] = old_max_feedrate_e;
+    //max_feedrate[E_AXIS] = old_max_feedrate_e;
     retract_acceleration = old_retract_acceleration;
     max_e_jerk = old_max_e_jerk;
 }

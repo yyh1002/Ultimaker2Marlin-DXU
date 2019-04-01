@@ -16,7 +16,7 @@ class CommandBuffer
     static void dwell(const unsigned long m);
 
 #if EXTRUDERS > 1
-    static void move2SafeYPos();
+    //static void move2SafeYPos();
     static void move2dock(bool bRetract);
     static float preparePriming(uint8_t e);
     void processT0(bool bRetract, bool bWipe);
