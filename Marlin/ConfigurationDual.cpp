@@ -16,8 +16,8 @@
 // wrong data being written to the variables.
 #define STORE_DUAL_VERSION 3
 
-#define DOCK_X_POSITION    218.0
-#define DOCK_Y_POSITION     188.0
+#define DOCK_X_POSITION    216.0
+#define DOCK_Y_POSITION     205.5
 
 #define WIPE_X_POSITION    105
 #define WIPE_Y_POSITION     27
