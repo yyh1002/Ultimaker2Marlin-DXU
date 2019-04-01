@@ -136,10 +136,10 @@ void abortPrint(bool bQuickstop)
     set_extrude_min_temp(minTemp);
     doCooldown();
 
-/*#if EXTRUDERS > 1
+#if EXTRUDERS > 1
     // move to a safe y position in dual mode
-    CommandBuffer::move2SafeYPos();
-#endif // EXTRUDERS*/
+    CommandBuffer::move2SafeXPos();
+#endif // EXTRUDERS
     if (current_position[Z_AXIS] > max_pos[Z_AXIS] - 30)
     {
         CommandBuffer::homeHead();

@@ -14,7 +14,8 @@ CommandBuffer cmdBuffer;
 
 #define TOOLCHANGE_DISTANCEX 8.0f
 #define TOOLCHANGE_DISTANCEY 18.0f
-//#define TOOLCHANGE_STARTY DUAL_Y_MIN_POS
+#define TOOLCHANGE_STARTX DUAL_X_MAX_POS
+#define DOCK_OFFSET 15.0f
 #define WIPE_STARTX 45.0f
 #define WIPE_DISTANCEX 33.0f
 #define WIPE_DISTANCEY 4.0f
@@ -179,7 +180,7 @@ void CommandBuffer::processT0(bool bRetract, bool bWipe)
     {
         processScript(t0);
         if (bRetract)
-        {9
+        {
             toolchange_retract(current_position[X_AXIS], current_position[Y_AXIS], toolchange_retractfeedrate[1]/60, 1);
         }
     }
@@ -187,27 +188,30 @@ void CommandBuffer::processT0(bool bRetract, bool bWipe)
 #endif // SDSUPPORT
     {
         //float ypos = min(current_position[Y_AXIS], dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY);
-        float ypos = dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY;
-        /*if ((IS_WIPE_ENABLED && current_position[X_AXIS] < wipe_position[X_AXIS]))
+		    /*float ypos = dock_position[Y_AXIS];
+        if ((IS_WIPE_ENABLED && current_position[Y_AXIS] < wipe_position[Y_AXIS]))
         {
-            ypos = dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY - roundOffset(Y_AXIS, extruder_offset[Y_AXIS][active_extruder]);
+            ypos = TOOLCHANGE_STARTX - roundOffset(Y_AXIS, extruder_offset[Y_AXIS][active_extruder]);
         }*/
-
+        if (current_position[X_AXIS] > TOOLCHANGE_STARTX)
+        {
+            CommandBuffer::moveHead(TOOLCHANGE_STARTX, current_position[Y_AXIS], 200);
+        }
         if (bRetract)
         {
-            toolchange_retract(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, ypos, 200, 1);
+            toolchange_retract(TOOLCHANGE_STARTX, dock_position[Y_AXIS] - TOOLCHANGE_DISTANCEY, 200, 1);
         }
         else
         {
-            CommandBuffer::moveHead(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, ypos, 200);
+            CommandBuffer::moveHead(TOOLCHANGE_STARTX, dock_position[Y_AXIS] - TOOLCHANGE_DISTANCEY, 200);
         }
-        CommandBuffer::moveHead(current_position[X_AXIS], dock_position[Y_AXIS], 150);
-        CommandBuffer::moveHead(dock_position[X_AXIS], dock_position[Y_AXIS], 100);
-        CommandBuffer::moveHead(current_position[X_AXIS], dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 50);
-        CommandBuffer::moveHead(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, current_position[Y_AXIS], 100);
+        //CommandBuffer::moveHead(current_position[X_AXIS], dock_position[Y_AXIS], 150);
+        CommandBuffer::moveHead(dock_position[X_AXIS], current_position[Y_AXIS], 100);
+        CommandBuffer::moveHead(current_position[X_AXIS], dock_position[Y_AXIS], 50);
+        CommandBuffer::moveHead(TOOLCHANGE_STARTX, current_position[Y_AXIS], 100);
         if (!bWipe && !bRetract)
         {
-            CommandBuffer::moveHead(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, current_position[Y_AXIS], 200);
+            CommandBuffer::moveHead(TOOLCHANGE_STARTX, current_position[Y_AXIS], 100);
         }
   }
 }
@@ -226,12 +230,26 @@ void CommandBuffer::processT1(bool bRetract, bool bWipe)
     else
 #endif // SDSUPPORT
     {
-        CommandBuffer::move2dock(bRetract);
-        CommandBuffer::moveHead(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, dock_position[Y_AXIS], 100);
+        if (current_position[X_AXIS] > TOOLCHANGE_STARTX)
+        {
+            CommandBuffer::moveHead(TOOLCHANGE_STARTX, current_position[Y_AXIS], 200);
+        }
+        if (bRetract)
+        {
+            toolchange_retract(TOOLCHANGE_STARTX, dock_position[Y_AXIS] + DOCK_OFFSET, 200, 0);
+            CommandBuffer::moveHead(dock_position[X_AXIS], current_position[Y_AXIS], 200);
+        }
+        else
+        {
+            CommandBuffer::moveHead(TOOLCHANGE_STARTX, dock_position[Y_AXIS] + DOCK_OFFSET, 200);
+            CommandBuffer::moveHead(dock_position[X_AXIS], current_position[Y_AXIS], 200);
+        }
+        CommandBuffer::moveHead(dock_position[X_AXIS], dock_position[Y_AXIS] + DOCK_OFFSET - TOOLCHANGE_DISTANCEY, 3000);
+        CommandBuffer::moveHead(TOOLCHANGE_STARTX, current_position[Y_AXIS], 100);
 
         if (!bWipe && !bRetract)
         {
-            CommandBuffer::moveHead(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 200);
+            CommandBuffer::moveHead(TOOLCHANGE_STARTX, dock_position[Y_AXIS] + DOCK_OFFSET - TOOLCHANGE_DISTANCEY, 200);
         }
   }
 }
@@ -322,19 +340,17 @@ void CommandBuffer::moveHead(float x, float y, int feedrate)
 #if EXTRUDERS > 1
 void CommandBuffer::move2dock(bool bRetract)
 {
-    /*if (current_position[Y_AXIS] < dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY)
+    if (current_position[X_AXIS] > TOOLCHANGE_STARTX)
     {
-        CommandBuffer::moveHead(current_position[X_AXIS], dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 200);
-    }*/
+        CommandBuffer::moveHead(TOOLCHANGE_STARTX, current_position[Y_AXIS], 200);
+    }
     if (bRetract)
     {
-        toolchange_retract(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 200, 0);
-        CommandBuffer::moveHead(dock_position[X_AXIS], dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 3000);
+        toolchange_retract(TOOLCHANGE_STARTX, dock_position[Y_AXIS], 200, 0);
     }
     else
     {
-        CommandBuffer::moveHead(dock_position[X_AXIS] - TOOLCHANGE_DISTANCEX, dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 200);
-        CommandBuffer::moveHead(dock_position[X_AXIS], dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 200);
+        CommandBuffer::moveHead(TOOLCHANGE_STARTX, dock_position[Y_AXIS], 200);
     }
     CommandBuffer::moveHead(dock_position[X_AXIS], dock_position[Y_AXIS], 3000);
 }
@@ -347,13 +363,13 @@ void CommandBuffer::move2heatup()
     if IS_DUAL_ENABLED
     {
         /*x = wipe_position[X_AXIS]+roundOffset(X_AXIS, extruder_offset[X_AXIS][active_extruder]);
-        if (current_position[Y_AXIS] >= dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY)
+        if (current_position[Y_AXIS] >= TOOLCHANGE_STARTY)
         {
         // y = 65.0f;
-            CommandBuffer::moveHead(x, dock_position[Y_AXIS] + TOOLCHANGE_DISTANCEY, 200);
+            CommandBuffer::moveHead(x, TOOLCHANGE_STARTY, 200);
         }*/
-        x = max_pos[X_AXIS] - 10.0;
-        y = min_pos[Y_AXIS] + 10.0;
+    x = max_pos[X_AXIS] - 10.0;
+		y = min_pos[Y_AXIS] + 10.0;
     }
     else
     {
@@ -381,13 +397,13 @@ void CommandBuffer::move2front()
 
 #if (EXTRUDERS > 1)
 // move to a safe y position in dual mode
-/*void CommandBuffer::move2SafeYPos()
+void CommandBuffer::move2SafeXPos()
 {
-    if (IS_DUAL_ENABLED && (position_state & KNOWNPOS_Y) && current_position[Y_AXIS] < DUAL_Y_MIN_POS)
+    if (IS_DUAL_ENABLED && (position_state & KNOWNPOS_X) && current_position[X_AXIS] > DUAL_X_MAX_POS)
     {
-        moveHead(current_position[X_AXIS], DUAL_Y_MIN_POS, 120);
+        moveHead(DUAL_X_MAX_POS, current_position[Y_AXIS], 120);
     }
-}*/
+}
 #endif
 
 void CommandBuffer::homeHead()

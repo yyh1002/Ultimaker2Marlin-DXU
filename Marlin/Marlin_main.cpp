@@ -3739,7 +3739,7 @@ bool changeExtruder(uint8_t nextExtruder, bool moveZ)
             current_position[Z_AXIS] = destination[Z_AXIS];
             
             // Zhop before XY test
-            // plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], homing_feedrate[Z_AXIS]/60, active_extruder);
+            //plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], homing_feedrate[Z_AXIS]/60, active_extruder);
             
             if (nextExtruder)
             {
@@ -3784,11 +3784,11 @@ bool changeExtruder(uint8_t nextExtruder, bool moveZ)
 
                 // wait for nozzle heatup
                 reheatNozzle(active_extruder);
-                /*if (printing_state == PRINT_STATE_ABORT)
+                if (printing_state == PRINT_STATE_ABORT)
                 {
-                    CommandBuffer::move2SafeYPos();
+                    CommandBuffer::move2SafeXPos();
                 }
-                else*/
+                else
                 {
                     if (IS_WIPE_ENABLED)
                     {
