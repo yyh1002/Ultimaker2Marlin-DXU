@@ -1432,6 +1432,13 @@ void lcd_print_pause()
             zdiff = 2;
         }
 
+        // This should really in M601... but for unknown reason
+        // backup_temperature only declared in lcd related headers...
+        // in case we resume print and backup temperature has a stalled value
+        for (int e = 0; e < EXTRUDERS; e++) {
+            backup_temperature[e] = target_temperature[e];
+        }
+
         char buffer[32] = {0};
         char buffer_len[10];
     #if (EXTRUDERS > 1)
