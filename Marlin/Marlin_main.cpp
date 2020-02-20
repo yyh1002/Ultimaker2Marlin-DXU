@@ -2456,24 +2456,24 @@ void process_command(const char *strCmd, bool sendAck)
       }
       break;
     #endif //PIDTEMP
-    case 240: // M240  Triggers a camera by emulating a Canon RC-1 : http://www.doc-diy.net/photo/rc-1_hacked/
+    case 240: // M240  Triggers a phone camera by relay //emulating a Canon RC-1 : http://www.doc-diy.net/photo/rc-1_hacked/
      {
       #if defined(PHOTOGRAPH_PIN) && PHOTOGRAPH_PIN > -1
-        const uint8_t NUM_PULSES=16;
-        const float PULSE_LENGTH=0.01524;
+        //const uint8_t NUM_PULSES=1;
+        const float PULSE_LENGTH=200;
+        //for(int i=0; i < NUM_PULSES; i++) {
+          WRITE(PHOTOGRAPH_PIN, HIGH);
+          _delay_ms(PULSE_LENGTH);
+          WRITE(PHOTOGRAPH_PIN, LOW);
+          _delay_ms(PULSE_LENGTH);
+        //}
+        /*delay(7.33);
         for(int i=0; i < NUM_PULSES; i++) {
           WRITE(PHOTOGRAPH_PIN, HIGH);
           _delay_ms(PULSE_LENGTH);
           WRITE(PHOTOGRAPH_PIN, LOW);
           _delay_ms(PULSE_LENGTH);
-        }
-        delay(7.33);
-        for(int i=0; i < NUM_PULSES; i++) {
-          WRITE(PHOTOGRAPH_PIN, HIGH);
-          _delay_ms(PULSE_LENGTH);
-          WRITE(PHOTOGRAPH_PIN, LOW);
-          _delay_ms(PULSE_LENGTH);
-        }
+        }*/
       #endif
      }
     break;
@@ -3658,7 +3658,9 @@ bool changeExtruder(uint8_t nextExtruder, bool moveZ)
     if (!(position_state & (KNOWNPOS_X | KNOWNPOS_Y)))
     {
         // head not homed
-        active_extruder = nextExtruder;
+        // active_extruder = nextExtruder;
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM("Header position not yet known");
         return false;
     }
 
